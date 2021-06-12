@@ -127,15 +127,15 @@ class Projectile(pygame.sprite.Sprite):
 
     def moveE1(self, x, y):
         if not self.completed:
-            self.xval = self.x - x
-            self.yval = self.y - y
+            self.xval = self.x - x - 20
+            self.yval = self.y - y - 20
             self.xval = self.xval / math.sqrt((self.x - x)**2 + (self.y - y)**2)
             self.yval = self.yval / math.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
             self.completed = True
         self.bullet = display.blit(self.image4, (self.x - 5, self.y - 5))
         display.blit(self.glow, (self.x - 10, self.y - 10))
-        self.x += self.xval * -5
-        self.y += self.yval * -5
+        self.x += self.xval * -8
+        self.y += self.yval * -8
         #yo
 
 class Key():
@@ -233,6 +233,7 @@ class Enemy(pygame.sprite.Sprite):
         self.movement = 1
         self.movementy = 1
         self.sprites = []
+        self.enemy2 = pygame.image.load("enemy2_1.png")
         self.sprites.append(pygame.image.load("enemy1.png"))
         self.sprites.append(pygame.image.load("enemy2.png"))
         self.sprites.append(pygame.image.load("enemy3.png"))
@@ -274,7 +275,7 @@ class Enemy(pygame.sprite.Sprite):
             if self.x - 10 <= i.x and (self.x + 50) >= i.x and self.y - 10 <= i.y and (self.y + 50) >= i.y:
                 self.current_sprite = 4
                 projlist.remove(i)
-                self.health -= 100
+                self.health -= 1
 
     def pattern1(self): #basic enemy patter back and forth shooting
         self.firerate = 25
@@ -291,12 +292,18 @@ class Enemy(pygame.sprite.Sprite):
             self.x1 = 10
 
     def pattern3(self):
+        self.firerate = 250
         proj.xval = proj.xval * -1
         proj.yval = proj.yval * -1
-        self.firerate = 50
         self.x1 = player.x
         self.y1 = player.y
 
+    def pattern4(self):
+        self.firerate = 50
+        self.x1 = player.x
+        self.y1 = player.y
+        proj.x += proj.xval * -1
+        proj.y += proj.yval * -1
 
     def movement1(self):
         self.x += self.movement
@@ -314,13 +321,13 @@ class Enemy(pygame.sprite.Sprite):
     def movement2(self):
         self.x += self.movement * 2
         self.y += self.movementy * 2
-        if self.x >= 700:
+        if self.x >= 636:
             self.movement = self.movement * -1
-        elif self.x <= 0:
+        elif self.x <= 15:
             self.movement = self.movement * -1
-        elif self.y >= 700:
+        elif self.y >= 626:
             self.movementy = self.movementy * -1
-        elif self.y <= 0:
+        elif self.y <= 15:
             self.movementy = self.movementy * -1
 
     def draw(self):
@@ -351,14 +358,15 @@ class Enemy(pygame.sprite.Sprite):
             self.randNumLabel = self.myFont.render(str(self.health), 1, (255, 0, 0))
             display.blit(self.shadow, (self.x, self.y + 35))
             display.blit(self.randNumLabel, (self.x, self.y - 40))
-            self.enemy1 = display.blit(self.image3, (self.x,self.y))
+            display.blit(self.enemy2, (self.x,self.y))
+            display.blit(self.hands, (self.x + 5, self.y + 38))
             enemy.checkhit(player.getprojlist())
             for i in self.projlist:
                 i.moveE1(self.x1, self.y1)
-            if self.health > 75:
+            if self.health > 20:
                 enemy.pattern3()
             else:
-                enemy.pattern2()
+                enemy.pattern4()
             enemy.movement2()
 
     def shoot(self):
@@ -579,6 +587,5 @@ run = True
 
 while run:
         levelnum.state_manager()
-        print(f"val 1 = {proj.xval} val 2 = {proj.yval}")
 
 pygame.quit
