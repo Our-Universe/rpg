@@ -6,6 +6,7 @@ pygame.init()
 display = pygame.display.set_mode((700,800))
 pygame.display.set_caption("RPG")
 
+
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         self.x = 330
