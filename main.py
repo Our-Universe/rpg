@@ -136,6 +136,7 @@ class Projectile(pygame.sprite.Sprite):
         display.blit(self.glow, (self.x - 10, self.y - 10))
         self.x += self.xval * -5
         self.y += self.yval * -5
+        #yo
 
 class Key():
     def __init__(self):
