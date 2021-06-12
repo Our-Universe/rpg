@@ -125,6 +125,18 @@ class Projectile(pygame.sprite.Sprite):
         self.x += self.xval * 5
         self.y += self.yval * 5
 
+    def moveE1(self, x, y):
+        if not self.completed:
+            self.xval = self.x - x
+            self.yval = self.y - y
+            self.xval = self.xval / math.sqrt((self.x - x)**2 + (self.y - y)**2)
+            self.yval = self.yval / math.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
+            self.completed = True
+        self.bullet = display.blit(self.image4, (self.x - 5, self.y - 5))
+        display.blit(self.glow, (self.x - 10, self.y - 10))
+        self.x += self.xval * -5
+        self.y += self.yval * -5
+
 class Key():
     def __init__(self):
         self.key1x = enemy.x
@@ -341,7 +353,7 @@ class Enemy(pygame.sprite.Sprite):
             self.enemy1 = display.blit(self.image3, (self.x,self.y))
             enemy.checkhit(player.getprojlist())
             for i in self.projlist:
-                i.moveE(self.x1, self.y1)
+                i.moveE1(self.x1, self.y1)
             if self.health > 75:
                 enemy.pattern3()
             else:
