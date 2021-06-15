@@ -31,12 +31,15 @@ class Player(pygame.sprite.Sprite):
             try:
                 for i in projlist:
                     if self.x - 10 <= i.x and (self.x + 40) >= i.x and self.y - 10 <= i.y and (self.y + 40) >= i.y:
+                        for j in range(5):
+                            particle2.add_particles()
                         projlist.remove(i)
                         self.health -= 1
                         self.healthlvl += 1
                     if enemy.health <= 0:
                         self.collideafterdeath += 1
                         projlist.remove(i) #removes all enemy projectiles once enemy is dead
+
             except:
                 pass #no error message for non game breaking bug
 
@@ -291,6 +294,7 @@ class Enemy(pygame.sprite.Sprite):
         self.shadow = pygame.image.load("enemy1shadow.png")
         self.handshadow = pygame.image.load("enemy1hands_shadow.png")
         self.chest = pygame.image.load("chestclosed.png")
+        self.alive = True
 
     def update(self):
         if self.current_sprite <= 2:
@@ -315,7 +319,8 @@ class Enemy(pygame.sprite.Sprite):
                 self.current_sprite = 4
                 projlist.remove(i)
                 self.health -= 20
-                particle1.add_particlesp()
+                for j in range(5):
+                    particle3.add_particles()
 
     def checkhitchest(self, projlist):
         for i in projlist:
@@ -409,6 +414,15 @@ class Enemy(pygame.sprite.Sprite):
                 enemy.pattern2()
             enemy.movement1()
 
+        if self.health <= 0:
+            self.alive = False
+
+        if self.alive == False:
+            for j in range(5):
+                particle3.add_particles()
+                self.alive = True
+
+
     def draw2(self):
         if self.health > 0:
             self.xkey = self.x
@@ -430,6 +444,14 @@ class Enemy(pygame.sprite.Sprite):
                 enemy.pattern4()
             enemy.movement2()
 
+        if self.health <= 0:
+            self.alive = False
+
+        if self.alive == False:
+            for j in range(5):
+                particle3.add_particles()
+                self.alive = True
+
     def draw3(self):
         if self.health > 0:
             self.xkey = self.x
@@ -447,6 +469,14 @@ class Enemy(pygame.sprite.Sprite):
                 i.moveE(self.x1, self.y1)
             enemy.pattern5()
             enemy.movement3()
+
+        if self.health <= 0:
+            self.alive = False
+
+        if self.alive == False:
+            for j in range(5):
+                particle3.add_particles()
+                self.alive = True
 
     def drawchest(self):
         if self.chesthealth > 0:
@@ -598,11 +628,11 @@ class Gamestate():
         if self.state == 1:
             self.intro()
         if self.state == 2:
-            self.level1()
-        if self.state == 3:
             self.level2()
-        if self.state == 4:
+        if self.state == 3:
             self.level3()
+        if self.state == 4:
+            self.level1()
 
     def door_collision(self):
         if doors.keypedestal >= 1:
@@ -627,6 +657,8 @@ class Gamestate():
         doors.displaypedestal()
         player.draw()
         particle1.emit()
+        particle2.emit()
+        particle3.emit()
         key.key1lvl1char()
         doors.doorstate()
         doors.pedestalcoll()
@@ -657,6 +689,8 @@ class Gamestate():
         doors.displaydoor()
         enemy.shoot()
         particle1.emit()
+        particle2.emit()
+        particle3.emit()
         enemy.draw()
         enemy.update()
         removeproj(player.getprojlist())
@@ -677,6 +711,8 @@ class Gamestate():
         doors.displaypedestal()
         player.draw()
         particle1.emit()
+        particle2.emit()
+        particle3.emit()
         key.key1lvl1char()
         doors.pedestalcoll()
         doors.doorstate()
@@ -702,6 +738,7 @@ class Gamestate():
         doors.displaypedestal()
         player.draw()
         particle1.emit()
+        particle2.emit()
         key.key1lvl1char()
         doors.pedestalcoll()
         doors.doorstate()
@@ -718,7 +755,7 @@ class Gamestate():
         stats.draw()
         pygame.display.update()
 
-class ParticlePrinciple:
+class keyParticle:
     def __init__(self):
         self.particles = []
         self.particles2 = []
@@ -763,12 +800,65 @@ class ParticlePrinciple:
         self.particle_copy = [particle for particle in self.particles if particle[1] > 0]
         self.particles = self.particle_copy
 
+class playerParticle:
+    def __init__(self):
+        self.particles = []
+
+    def emit(self):
+        if self.particles:
+            self.delete_particles()
+            for particle in self.particles:
+                particle[0][1] += particle[2][0]
+                particle[0][0] += particle[2][1]
+                particle[1] -= 0.2
+                pygame.draw.circle(display, (225,50,0),particle[0],int(particle[1]))
+
+    def add_particles(self):
+        self.pos_x = player.x + 20
+        self.pos_y = player.y + 20
+        self.radius = 8
+        self.direction_x = random.randint(-2, 2)
+        self.direction_y = random.randint(-2, 2)
+        self.particle_circle = [[self.pos_x, self.pos_y], self.radius, [self.direction_x, self.direction_y]]
+        self.particles.append(self.particle_circle)
+
+    def delete_particles(self):
+        self.particle_copy = [particle for particle in self.particles if particle[1] > 0]
+        self.particles = self.particle_copy
+
+class enemyParticle:
+    def __init__(self):
+        self.particles = []
+
+    def emit(self):
+        if self.particles:
+            self.delete_particles()
+            for particle in self.particles:
+                particle[0][1] += particle[2][0]
+                particle[0][0] += particle[2][1]
+                particle[1] -= 0.2
+                pygame.draw.circle(display, (225,50,0),particle[0],int(particle[1]))
+
+    def add_particles(self):
+        self.pos_x = enemy.x + 20
+        self.pos_y = enemy.y + 20
+        self.radius = 8
+        self.direction_x = random.randint(-2, 2)
+        self.direction_y = random.randint(-2, 2)
+        self.particle_circle = [[self.pos_x, self.pos_y], self.radius, [self.direction_x, self.direction_y]]
+        self.particles.append(self.particle_circle)
+
+    def delete_particles(self):
+        self.particle_copy = [particle for particle in self.particles if particle[1] > 0]
+        self.particles = self.particle_copy
+
 
 PARTICLE_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(PARTICLE_EVENT,30)
 
-particle1 = ParticlePrinciple()
-particle2 = ParticlePrinciple()
+particle1 = keyParticle()
+particle2 = playerParticle()
+particle3 = enemyParticle()
 
 clock = pygame.time.Clock()
 
